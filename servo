@@ -1,0 +1,59 @@
+#include <LiquidCrystal.h>
+#include <Servo.h>
+
+Servo myservo; 
+
+int IR1 = 7;
+int IR2 = 9;
+
+int Slot = 6;           //Enter Total number of parking Slots
+
+int flag1 = 0;
+int flag2 = 0;
+
+int pos = 0;
+
+int Contrast=100;
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(IR1, INPUT);
+  pinMode(IR2, INPUT);
+  analogWrite(6,Contrast);
+  lcd.begin(16, 2);
+  myservo.attach(8);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if(digitalRead (IR1) == LOW && flag1==0){
+if(Slot>0){flag1=1;
+if(flag2==0){myservo.write(0); Slot = Slot-1;}
+}else{
+lcd.setCursor (0,0);
+lcd.print("    SORRY :(    ");  
+lcd.setCursor (0,1);
+lcd.print("  Parking Full  "); 
+delay (3000);
+lcd.clear(); 
+}
+}
+
+if(digitalRead (IR2) == LOW && flag2==0){flag2=1;
+if(flag1==0){myservo.write(0); Slot = Slot+1;}
+}
+
+if(flag1==1 && flag2==1){
+delay (1000);
+myservo.write(100);
+flag1=0, flag2=0;
+}
+
+lcd.setCursor (0,0);
+lcd.print("    WELCOME!    ");
+lcd.setCursor (0,1);
+lcd.print("Slot Left: ");
+lcd.print(Slot);
+
+}
