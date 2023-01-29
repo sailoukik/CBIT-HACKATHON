@@ -1,0 +1,88 @@
+#include <Wire.h>
+#include <ESP8266WiFi.h>
+int a=A0;
+int b=D1;
+int c=D2;
+int d=D3;
+int e=D4;
+int f=D5;
+char status;
+WiFiClient client;
+
+String apiKey = "KVGVBWFJLRUG84VP";
+const char *ssid =  "Password";
+const char *pass =  "WifiRouter";
+const char* server = "api.thingspeak.com";
+
+
+void setup() {
+  Serial.begin(9600);
+  delay(10);
+  Wire.begin();
+  pinMode(a, INPUT);
+  pinMode(b, INPUT);
+  pinMode(c, INPUT);
+  pinMode(d, INPUT);
+  pinMode(e, INPUT);
+  pinMode(f, INPUT);
+  WiFi.begin(ssid, pass);
+
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected");
+}
+
+void loop() {
+ a = digitalRead(a);
+ b = digitalRead(b);
+ c = digitalRead(c);
+ d = digitalRead(d);
+ e = digitalRead(e);
+ f = digitalRead(f);
+  if (client.connect(server, 80)) {
+    String postStr = apiKey;
+    postStr += "&field1=";
+    postStr += String(a);
+    postStr += "&field2=";
+    postStr += String(b);
+    postStr += "&field3=";
+    postStr += String(c);
+    postStr += "&field4=";
+    postStr += String(d);
+    postStr += "&field5=";
+    postStr += String(e);
+    postStr += "&field6=";
+    postStr += String(f);
+    
+
+    client.print("POST /update HTTP/1.1\n");
+    client.print("Host: api.thingspeak.com\n");
+    client.print("Connection: close\n");
+    client.print("X-THINGSPEAKAPIKEY: " + apiKey + "\n");
+    client.print("Content-Type: application/x-www-form-urlencoded\n");
+    client.print("Content-Length: ");
+    client.print(postStr.length());
+    client.print("\n\n\n\n");
+    client.print(postStr);
+
+    Serial.print("parking 1 ");
+    Serial.println(a);
+    Serial.print("parking 2 ");
+    Serial.println(b);
+    Serial.print("parking 3");
+    Serial.println(c);
+    Serial.println("parking 4 ");
+    Serial.println(d);
+    Serial.println("parking 5 ");
+    Serial.println(e);
+    Serial.println("parking 6 ");
+    Serial.println(f);
+
+  }
+  client.stop();
+  delay(1000);
+}
